@@ -1,66 +1,115 @@
-# Data Science
+# Parkinson's Disease & Forest Cover Type Classification
 
-The goal of this project is to solve 2 classification problems:
-* Classify Parkinson's disease from speech (binary classification)
-* Classify forest cover type (type of trees) from cartographic data (multiclass classification)
+End-to-end ML pipeline for two classification problems: detecting Parkinson's disease from speech features (binary) and predicting forest cover type from cartographic data (multiclass, 7 classes).
 
----
+## Overview
 
-## Data
+| | Parkinson's Disease | Forest Covertype |
+|---|---|---|
+| **Task** | Binary classification | Multiclass (7 classes) |
+| **Instances** | 756 | 581,012 |
+| **Features** | 754 | 54 |
+| **Source** | [UCI ML Repository](https://archive.ics.uci.edu/ml/datasets/Parkinson%27s+Disease+Classification) | [UCI ML Repository](https://archive.ics.uci.edu/ml/datasets/Covertype) |
 
-### [Parkinson Disease](https://archive.ics.uci.edu/ml/datasets/Parkinson%27s+Disease+Classification) (pd_speech_features.csv)
+## Key Results
 
-The data used in this study was gathered from 188 patients with PD at the Department of Neurology in CerrahpaÅŸa Faculty of Medicine, Istanbul University. The control group consists of 64 healthy individuals. During the data collection process, the sustained phonation of the vowel /a/ was collected from each subject with three repetitions.
+> **Note:** Replace the values below with your actual results. These are placeholders.
 
-Various speech signal processing algorithms including Time Frequency Features, Mel Frequency Cepstral Coefficients (MFCCs), Wavelet Transform based Features, Vocal Fold Features and TWQT features have been applied to the speech recordings of Parkinson's Disease (PD) patients to extract clinically useful information for PD assessment.
+| Model | Parkinson's (Accuracy) | Covertype (Accuracy) |
+|---|---|---|
+| Naïve Bayes | _X%_ | _X%_ |
+| Decision Tree | _X%_ | _X%_ |
+| KNN | _X%_ | _X%_ |
+| Random Forest | _X%_ | _X%_ |
+| XGBoost | _X%_ | _X%_ |
+| Gradient Boosting | _X%_ | _X%_ |
 
-* Number of features $n = 754$
-* Number of instances $m = 756 = (3 * (188+64))$
-* Target: binary (0 = no Parkinson, 1 = has Parkinson)
+## Pipeline
 
+```
+Raw Data → Cleaning → Feature Scaling → Feature Selection → PCA → Data Balancing → Model Training → Evaluation
+```
 
-### [Covertype](https://archive.ics.uci.edu/ml/datasets/Covertype) (covtype.info + covtype.data)
-
-The actual forest cover type for a given observation (30 x 30 meter cell) was determined from US Forest Service (USFS) Region 2 Resource Information System (RIS) data.
-
-Features of the observations relate to elevation, slope, distance to water, sunlight intensity, soil.
- 
-
-* Number of features $n = 54$
-* Number of instances $m = 581012$
-* Target: 7 classes - Spruce/Fir, Lodgepole Pine, Ponderosa Pine, Cottonwood/Willow, Aspen, Douglas Fir, or Krummholz
-
-
-
----
-
-## Methodology
-
-### Statistical Analysis
+### Preprocessing
+- **Feature scaling** — normalization of input features (`Normalize.py`)
+- **Feature selection** — dimensionality reduction to remove noisy/redundant features (`Feature_Selection.py`)
+- **PCA** — principal component analysis for further dimensionality reduction (`PCA.py`)
+- **Data balancing** — handling class imbalance in the Parkinson's dataset (`data_balancing.py`)
 
 ### Unsupervised Learning
+- **Clustering** — exploratory analysis to understand data structure (`Clustering.py`, `Unsupervised.py`)
+- **Association Rule Mining** — pattern discovery across features (`ARM.py`)
 
-#### Preprocessing
-* Feature scaling
-* Feature selection
-* Data Balancing
-* PCA
+### Classification Models
+Each model was tuned via hyperparameter optimization to maximize performance:
 
-#### Pattern Mining
+| Script | Model |
+|---|---|
+| `naive_bayes.py` | Naïve Bayes |
+| `Decision_Tree.py` | Decision Trees |
+| `KNN.py` | K-Nearest Neighbors |
+| `RandomForest.py` | Random Forests |
+| `GradientBoost.py` | Gradient Boosting |
+| `XGBoost.py` | XGBoost |
 
-#### Clustering
+Results are compared in `compareResults.py` and visualized in the `Charts/` folder.
 
+## Project Structure
 
-### Classification
+```
+├── Data/                  # Raw datasets
+├── Charts/                # Generated plots and visualizations
+├── Correlations/          # Correlation analysis outputs
+├── Groups/                # Grouped analysis outputs
+├── test_cases/            # Test configurations
+├── main.py                # Main entry point
+├── Preprocessing.py       # Data preprocessing pipeline
+├── data_cleaning.py       # Data cleaning utilities
+├── Normalize.py           # Feature scaling
+├── Feature_Selection.py   # Feature selection methods
+├── PCA.py                 # Principal Component Analysis
+├── data_balancing.py      # Class balancing (SMOTE, etc.)
+├── naive_bayes.py         # Naïve Bayes classifier
+├── Decision_Tree.py       # Decision Tree classifier
+├── KNN.py                 # K-Nearest Neighbors
+├── RandomForest.py        # Random Forest classifier
+├── GradientBoost.py       # Gradient Boosting classifier
+├── XGBoost.py             # XGBoost classifier
+├── Classification.py      # Classification utilities
+├── Clustering.py          # Clustering analysis
+├── Unsupervised.py        # Unsupervised learning methods
+├── ARM.py                 # Association Rule Mining
+├── analysis.py            # Statistical analysis
+├── compareResults.py      # Model comparison
+├── plot_functions.py      # Plotting utilities
+└── print_statistics.py    # Summary statistics
+```
 
-The main goal in this step was to tune the parameters of each model to obtain the best performance.
+## Getting Started
 
-#### Naïve Bayes
+### Requirements
 
-#### Decision Trees
+```
+pip install numpy pandas scikit-learn xgboost matplotlib seaborn mlxtend
+```
 
-#### kNN
+### Usage
 
-#### Random Forests
+```bash
+# Run the full pipeline
+python main.py
+```
 
-#### XGBoost
+## Datasets
+
+**Parkinson's Disease** — Speech recordings from 188 PD patients and 64 healthy controls (Istanbul University). Features extracted using MFCCs, wavelet transforms, vocal fold features, and TWQT.
+
+**Forest Covertype** — Cartographic data from the US Forest Service for 30×30m cells. Features include elevation, slope, distance to water, sunlight, and soil type. Target: 7 tree species.
+
+## Tech Stack
+
+Python · scikit-learn · XGBoost · pandas · NumPy · Matplotlib · Seaborn
+
+## Author
+
+**Diogo Ramalho** 
