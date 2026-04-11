@@ -110,6 +110,6 @@ python main.py
 
 Python · scikit-learn · XGBoost · pandas · NumPy · Matplotlib · Seaborn
 
-## Author
+## Authors
 
-**Diogo Ramalho** 
+Diogo Ramalho, André Guerra and Miguel Trinca
