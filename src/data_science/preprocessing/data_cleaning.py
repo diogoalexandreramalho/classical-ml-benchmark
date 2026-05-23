@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pandas as pd
 from pandas.plotting import register_matplotlib_converters
 import matplotlib.pyplot as plt
@@ -6,6 +8,8 @@ import re
 import json
 import seaborn as sns
 import numpy as np
+
+DATA_DIR = Path(__file__).resolve().parents[3] / "data"
 
 
 """register_matplotlib_converters()
@@ -16,7 +20,7 @@ print(data)"""
 
 # Creates a dic with a list of columns names associated to the titles given in the csv file
 def general_dic(write_file):
-	data2 = pd.read_csv('Data/pd_speech_features.csv', sep=',', decimal='.')
+	data2 = pd.read_csv(DATA_DIR / "raw" / "pd_speech_features.csv", sep=',', decimal='.')
 	dic = {"Start": []}
 	current_title = "Start"
 

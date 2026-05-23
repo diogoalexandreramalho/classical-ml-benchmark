@@ -1,19 +1,23 @@
+from pathlib import Path
+
 import pandas as pd
 import numpy as np
 from sklearn.feature_selection import SelectKBest, f_classif
 from sklearn.model_selection import train_test_split
 from IPython.display import display, HTML
 from sklearn.preprocessing import LabelBinarizer #for dummification
-from mlxtend.frequent_patterns import apriori, association_rules #for ARM 
+from mlxtend.frequent_patterns import apriori, association_rules #for ARM
 import matplotlib.pyplot as plt
 from data_science.viz import plots as func
 from data_science.preprocessing import data_cleaning as cleaner
 
+DATA_DIR = Path(__file__).resolve().parents[3] / "data"
+
 
 def run(source,data, group=None):
 
-    dataPD = pd.read_csv('Data/pd_speech_features.csv', sep=',', decimal='.', skiprows=1)    
-    dataCT = pd.read_csv('Data/covtype_test.data', sep=',', decimal='.')
+    dataPD = pd.read_csv(DATA_DIR / "raw" / "pd_speech_features.csv", sep=',', decimal='.', skiprows=1)
+    dataCT = pd.read_csv(DATA_DIR / "raw" / "covtype_test.data", sep=',', decimal='.')
 
     if source == "PD":
         target = "class"

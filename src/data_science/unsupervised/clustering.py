@@ -1,4 +1,6 @@
 import time, warnings
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -14,12 +16,13 @@ from sklearn.feature_selection import SelectKBest, f_classif
 from yellowbrick.cluster import KElbowVisualizer
 import mpl_toolkits.mplot3d.axes3d as p3
 
+DATA_DIR = Path(__file__).resolve().parents[3] / "data"
 
 
 def run(source,data):
 
-    dataPD = pd.read_csv('Data/pd_speech_features.csv', sep=',', decimal='.', skiprows=1)    
-    dataCT = pd.read_csv('Data/covtype_test.data', sep=',', decimal='.')    
+    dataPD = pd.read_csv(DATA_DIR / "raw" / "pd_speech_features.csv", sep=',', decimal='.', skiprows=1)
+    dataCT = pd.read_csv(DATA_DIR / "raw" / "covtype_test.data", sep=',', decimal='.')
 
 
 
