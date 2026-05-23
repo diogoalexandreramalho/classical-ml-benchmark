@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 import sklearn.metrics as metrics
 from sklearn.ensemble import RandomForestClassifier
-import plot_functions as func
+from data_science.viz import plots as func
 
 
 def simple_random_forest(trnX, tstX, trnY, tstY, n, d, f, labels):

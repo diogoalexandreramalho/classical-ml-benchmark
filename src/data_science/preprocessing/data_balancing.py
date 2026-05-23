@@ -2,16 +2,11 @@ import numpy as np
 import pandas as pd
 import sklearn.metrics as metrics
 import matplotlib.pyplot as plt
-import plot_functions as func
+from data_science.viz import plots as func
 
 from pandas.plotting import register_matplotlib_converters
 from sklearn.model_selection import train_test_split
 from imblearn.over_sampling import SMOTE, RandomOverSampler
-
-import Normalize as norm
-import naive_bayes as nb
-import KNN as knn
-import Decision_Tree as dt
 
 '''
 Prints the values for the class, and plots a bar_chart showing the

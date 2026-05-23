@@ -2,19 +2,19 @@ import pandas as pd
 import numpy as np
 from pandas.plotting import register_matplotlib_converters
 
-import data_balancing as balance
-import Normalize as norm
+from data_science.preprocessing import data_balancing as balance
+from data_science.preprocessing import normalize as norm
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import KFold
 
-import KNN as knn
-import Decision_Tree as dt
-import naive_bayes as nb
-import RandomForest as rf
-import GradientBoost as gb
-import XGBoost as xgb
+from data_science.models import knn
+from data_science.models import decision_tree as dt
+from data_science.models import naive_bayes as nb
+from data_science.models import random_forest as rf
+from data_science.models import gradient_boost as gb
+from data_science.models import xgboost_clf as xgb
 
-import print_statistics as stats
+from data_science.viz import print_statistics as stats
 
 
 def classification(data, source):

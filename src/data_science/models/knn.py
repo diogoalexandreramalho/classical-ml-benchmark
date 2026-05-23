@@ -9,7 +9,7 @@ import sklearn.metrics as metrics
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
-import plot_functions as func
+from data_science.viz import plots as func
 
 def simple_knn(trnX, tstX, trnY, tstY, n, d, labels):
 

@@ -4,7 +4,7 @@ from pandas.plotting import register_matplotlib_converters
 import matplotlib.pyplot as plt
 import sklearn.metrics as metrics
 from sklearn.naive_bayes import GaussianNB, MultinomialNB, BernoulliNB
-import plot_functions as plot_funcs
+from data_science.viz import plots as plot_funcs
 
 def simple_naive_bayes(trnX, tstX, trnY, tstY, labels):
     

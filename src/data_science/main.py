@@ -1,7 +1,7 @@
 import sys
 import pandas as pd
-import Classification as classif
-import Unsupervised as unsup
+from data_science import pipeline as classif
+from data_science import unsupervised as unsup
 
 def report(source, dataframe, task):
     

@@ -1,7 +1,7 @@
 import pandas as pd
 from pandas.plotting import register_matplotlib_converters
 import matplotlib.pyplot as plt
-import plot_functions as func
+from data_science.viz import plots as func
 import re
 import json
 import seaborn as sns

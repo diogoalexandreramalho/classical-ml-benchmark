@@ -6,10 +6,6 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 
-import naive_bayes as nb
-import KNN as knn
-import Decision_Tree as dt
-
 def standardScaler(trnX, tstX, trnY, tstY):
 
     scaler = StandardScaler()

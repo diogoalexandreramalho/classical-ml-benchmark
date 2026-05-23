@@ -2,8 +2,8 @@ import time, warnings
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import plot_functions as charts
-import Normalize as norm
+from data_science.viz import plots as charts
+from data_science.preprocessing import normalize as norm
 from itertools import cycle, islice
 from sklearn import datasets, metrics, cluster, mixture
 from sklearn.preprocessing import StandardScaler

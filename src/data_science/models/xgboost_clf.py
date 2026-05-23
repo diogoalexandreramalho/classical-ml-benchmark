@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from xgboost import XGBClassifier
 import sklearn.metrics as metrics
-import plot_functions as func
+from data_science.viz import plots as func
 
 
 def simple_xg_boost(trnX, tstX, trnY, tstY, n, d, labels):

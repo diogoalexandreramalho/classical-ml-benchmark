@@ -13,10 +13,10 @@ from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.feature_selection import SelectFromModel
 from sklearn.model_selection import train_test_split
 
-import data_balancing as balance
-import Normalize as norm
-import naive_bayes as nb
-import KNN as knn
+from data_science.preprocessing import data_balancing as balance
+from data_science.preprocessing import normalize as norm
+from data_science.models import naive_bayes as nb
+from data_science.models import knn
 
 #Note: Feature Selection removes ID for PD dataset
 def feature_selection(dataset, name):

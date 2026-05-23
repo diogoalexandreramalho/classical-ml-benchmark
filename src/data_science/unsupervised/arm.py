@@ -6,8 +6,8 @@ from IPython.display import display, HTML
 from sklearn.preprocessing import LabelBinarizer #for dummification
 from mlxtend.frequent_patterns import apriori, association_rules #for ARM 
 import matplotlib.pyplot as plt
-import plot_functions as func
-import data_cleaning as cleaner
+from data_science.viz import plots as func
+from data_science.preprocessing import data_cleaning as cleaner
 
 
 def run(source,data, group=None):
