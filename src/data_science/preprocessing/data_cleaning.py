@@ -57,13 +57,7 @@ def group_dic(group_data, key_len, write_file):
 
 
 # get the data associated to a set of variables
-def get_data_from_dic(dic, group_name):
-    lst = dic[group_name]
-    return data[lst]
-
-
-# get the data associated to a set of variables
-def get_data_from_dic2(data, dic, group_name):
+def get_data_from_dic(data, dic, group_name):
     lst = dic[group_name]
     return data[lst]
 
@@ -77,7 +71,7 @@ def get_data_by_expression(group_data, reg_expression):
         if x:
             group_lst += [var]
 
-    return data[group_lst]
+    return group_data[group_lst]
 
 
 # correlate a group of variables
@@ -137,7 +131,7 @@ def produce_allvariables(s, n):
 dic = general_dic(False)
 
 
-def baseline_features(dic, ratio, correlations, pickles, write):
+def baseline_features(data, dic, ratio, correlations, pickles, write):
     if not write:
         if ratio == 0.97:
             new_bf_data = pd.read_pickle("Pickles/Baseline/baseline_97.pkl")
@@ -151,7 +145,7 @@ def baseline_features(dic, ratio, correlations, pickles, write):
             new_bf_data = pd.read_pickle("Pickles/Baseline/baseline_80.pkl")
 
     else:
-        bf_data = get_data_from_dic(dic, "Baseline Features")
+        bf_data = get_data_from_dic(data, dic, "Baseline Features")
 
         # Shimmer
         if ratio > 0.89:
@@ -209,7 +203,7 @@ def baseline_features(dic, ratio, correlations, pickles, write):
             new_bf_data.to_pickle("Pickles/Baseline/baseline_80.pkl")
 
         if correlations:
-            new_bf_data = get_data_from_dic(dic, "Baseline Features")
+            new_bf_data = get_data_from_dic(data, dic, "Baseline Features")
 
             shimmer = get_data_by_expression(new_bf_data, "Shimmer$")
             group_correlation(shimmer)
@@ -226,21 +220,21 @@ def baseline_features(dic, ratio, correlations, pickles, write):
     return new_bf_data
 
 
-def bandwidth_parameters(dic, correlation, gender_data):
-    bp_data = get_data_from_dic(dic, "Bandwidth Parameters")
+def bandwidth_parameters(data, dic, correlation, gender_data):
+    bp_data = get_data_from_dic(data, dic, "Bandwidth Parameters")
     if correlation:
         group_correlation(bp_data)
     return bp_data
 
 
-def formant_frequencies(dic, correlation):
-    ff_data = get_data_from_dic(dic, "Formant Frequencies")
+def formant_frequencies(data, dic, correlation):
+    ff_data = get_data_from_dic(data, dic, "Formant Frequencies")
     if correlation:
         group_correlation(ff_data)
     return ff_data
 
 
-def intensity_parameters(dic, ratio, correlations, write):
+def intensity_parameters(data, dic, ratio, correlations, write):
     if not write:
         if ratio == 0.97 or ratio == 0.95:
             ip_data = pd.read_pickle("Pickles/Intensity/intensity_+91.pkl")
@@ -248,7 +242,7 @@ def intensity_parameters(dic, ratio, correlations, write):
             ip_data = pd.read_pickle("Pickles/Intensity/intensity_-91.pkl")
     else:
         if not correlations:
-            ip_data = get_data_from_dic(dic, "Intensity Parameters")
+            ip_data = get_data_from_dic(data, dic, "Intensity Parameters")
 
             if ratio > 0.91:
                 del ip_data["maxIntensity"]
@@ -261,14 +255,14 @@ def intensity_parameters(dic, ratio, correlations, write):
                 ip_data.to_pickle("Pickles/Intensity/intensity_-91.pkl")
 
         else:
-            ip_data = get_data_from_dic(dic, "Intensity Parameters")
+            ip_data = get_data_from_dic(data, dic, "Intensity Parameters")
             group_correlation(ip_data)
 
     return ip_data
 
 
-def mfcc(dic, ratio, correlations, pickles, write):
-    mfcc_data = get_data_from_dic(dic, "MFCC ")
+def mfcc(data, dic, ratio, correlations, pickles, write):
+    mfcc_data = get_data_from_dic(data, dic, "MFCC ")
 
     if not write:
         if ratio == 0.97:
@@ -469,8 +463,8 @@ def mfcc(dic, ratio, correlations, pickles, write):
     return new_mfcc_data
 
 
-def vocal_fold(dic, ratio, correlations, pickles, write):
-    vf_data = get_data_from_dic(dic, "Vocal Fold")
+def vocal_fold(data, dic, ratio, correlations, pickles, write):
+    vf_data = get_data_from_dic(data, dic, "Vocal Fold")
 
     if not write:
         if ratio == 0.97:
@@ -578,8 +572,8 @@ def vocal_fold(dic, ratio, correlations, pickles, write):
     return new_vf_data
 
 
-def wavelet_features(dic, ratio, correlations, pickles, write):
-    wf_data = get_data_from_dic(dic, "Wavelet Features")
+def wavelet_features(data, dic, ratio, correlations, pickles, write):
+    wf_data = get_data_from_dic(data, dic, "Wavelet Features")
 
     if not write:
         if ratio == 0.97:
@@ -1251,9 +1245,9 @@ def wavelet_features(dic, ratio, correlations, pickles, write):
     return new_wf_data
 
 
-def tqwt_features(dic):
+def tqwt_features(data, dic):
 
-    tqwt_data = get_data_from_dic(dic, "TQWT Features")
+    tqwt_data = get_data_from_dic(data, dic, "TQWT Features")
 
     """
 	# groups of data
@@ -1269,9 +1263,9 @@ def tqwt_features(dic):
 	tqwt_maxValue = get_data_by_expression(tqwt_data, "^tqwt_maxValue.*")
 	tqwt_skewnessValue = get_data_by_expression(tqwt_data, "^tqwt_skewnessValue.*")
 	tqwt_kurtosisValue = get_data_by_expression(tqwt_data, "^tqwt_kurtosisValue.*")
-	
 
-	# produce list of variables for a group  
+
+	# produce list of variables for a group
 	tqwt_energy_lst = produce_allvariables("tqwt_energy_dec_",37)
 	tqwt_entropy_shannon_lst = produce_allvariables("tqwt_entropy_shannon_dec_",37)
 	tqwt_entropy_log_lst = produce_allvariables("tqwt_entropy_log_dec_",37)
@@ -1286,7 +1280,7 @@ def tqwt_features(dic):
 	tqwt_kurtosisValue_lst = produce_allvariables("tqwt_kurtosisValue_dec_",37)
 
 
-	
+
 	# add new variable in a dataset that represents a group ######
 	data = add_variable_from_mean(data, "tqwt_energy",tqwt_energy_lst, 1)
 	data = add_variable_from_mean(data, "tqwt_entropy_shannon",tqwt_entropy_shannon_lst, 1)
@@ -1300,7 +1294,7 @@ def tqwt_features(dic):
 	data = add_variable_from_mean(data, "tqwt_maxValue",tqwt_maxValue_lst, 1)
 	data = add_variable_from_mean(data, "tqwt_skewnessValue",tqwt_skewnessValue_lst, 1)
 	data = add_variable_from_mean(data, "tqwt_kurtosisValue",tqwt_kurtosisValue_lst, 1)
-	
+
 
 	# add new variable in a dataset that represents a group ######
 	print("1/12")
@@ -1353,14 +1347,14 @@ def tqwt_features(dic):
 
 # sum = 0
 
-# bf_data = baseline_features(dic, 0.8, [0,0,0,0], [0,0,1,1], False)
-# ip_data = intensity_parameters(dic, 0.90, [0,0,0], True)
-# ff_data = formant_frequencies(dic, False)
-# bp_data = bandwidth_parameters(dic, False)
-# vf_data = vocal_fold(dic)
-# mfcc_data = mfcc(dic)
-# wf_data = wavelet_features(dic, False)
-# tqwt_data = tqwt_features(dic)
+# bf_data = baseline_features(data, dic, 0.8, [0,0,0,0], [0,0,1,1], False)
+# ip_data = intensity_parameters(data, dic, 0.90, [0,0,0], True)
+# ff_data = formant_frequencies(data, dic, False)
+# bp_data = bandwidth_parameters(data, dic, False)
+# vf_data = vocal_fold(data, dic)
+# mfcc_data = mfcc(data, dic)
+# wf_data = wavelet_features(data, dic, False)
+# tqwt_data = tqwt_features(data, dic)
 
 
 # new_data = data[['id','gender']]
