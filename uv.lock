@@ -122,7 +122,7 @@ wheels = [
 [[package]]
 name = "data-science"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "imbalanced-learn" },
     { name = "ipython" },
