@@ -22,7 +22,7 @@ from tempfile import TemporaryDirectory
 
 import pandas as pd
 
-RAW_DIR = Path(__file__).resolve().parents[2] / "data" / "raw"
+DATA_RAW_DIR = Path(__file__).resolve().parents[2] / "data" / "raw"
 
 
 class Dataset(ABC):
@@ -34,7 +34,7 @@ class Dataset(ABC):
 
     @property
     def raw_path(self) -> Path:
-        return RAW_DIR / self.filename
+        return DATA_RAW_DIR / self.filename
 
     @abstractmethod
     def download(self, insecure: bool = False) -> None: ...
@@ -75,7 +75,7 @@ class Covertype(Dataset):
     )
 
     def download(self, insecure: bool = False) -> None:
-        RAW_DIR.mkdir(parents=True, exist_ok=True)
+        DATA_RAW_DIR.mkdir(parents=True, exist_ok=True)
         with TemporaryDirectory() as tmp_str:
             tmp = Path(tmp_str)
             zip_path = tmp / "covertype.zip"
@@ -101,7 +101,7 @@ class Parkinsons(Dataset):
     url = "https://archive.ics.uci.edu/static/public/470/parkinson+s+disease+classification.zip"
 
     def download(self, insecure: bool = False) -> None:
-        RAW_DIR.mkdir(parents=True, exist_ok=True)
+        DATA_RAW_DIR.mkdir(parents=True, exist_ok=True)
         with TemporaryDirectory() as tmp_str:
             tmp = Path(tmp_str)
             zip_path = tmp / "parkinsons.zip"
