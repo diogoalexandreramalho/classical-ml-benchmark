@@ -16,3 +16,6 @@ dist/
 # IDE
 .vscode/
 .idea/
+
+# Raw datasets — regenerable via `python scripts/download_data.py`
+data/raw/*.csv
