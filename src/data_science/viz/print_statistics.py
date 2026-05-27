@@ -32,19 +32,36 @@ def print_cnf_mtx_CT(mtx):
 
 
 def print_parameters(classifier, parameters):
-
     if classifier == "Naive Bayes":
-        return parameters
+        return "GaussianNB"
     if classifier == "kNN":
-        return f"distance function = {parameters[0]}; nr neighbors = {parameters[1]}"
+        return (
+            f"distance function = {parameters['metric']}; "
+            f"nr neighbors = {parameters['n_neighbors']}"
+        )
     if classifier == "Decision Tree":
-        return f"criteria = {parameters[0]}; max depths = {parameters[1]}; min samples leaf = {parameters[2]}"
+        return (
+            f"criteria = {parameters['criterion']}; "
+            f"max depths = {parameters['max_depth']}; "
+            f"min samples leaf = {parameters['min_samples_leaf']}"
+        )
     if classifier == "Random Forest":
-        return f"max features = {parameters[0]}; max depths = {parameters[1]}; nr estimators = {parameters[2]}"
-    if classifier == "Gradient Boost":
-        return f"max features = {parameters[0]}; max depths = {parameters[1]}; nr estimators = {parameters[2]}; learning rate = {parameters[3]}"
+        return (
+            f"max features = {parameters['max_features']}; "
+            f"max depths = {parameters['max_depth']}; "
+            f"nr estimators = {parameters['n_estimators']}"
+        )
+    if classifier == "Gradient Boosting":
+        return (
+            f"max features = {parameters['max_features']}; "
+            f"max depths = {parameters['max_depth']}; "
+            f"nr estimators = {parameters['n_estimators']}; "
+            f"learning rate = {parameters['learning_rate']}"
+        )
     if classifier == "XGBoost":
-        return f"max depths = {parameters[0]}; nr estimators = {parameters[1]}"
+        return (
+            f"max depths = {parameters['max_depth']}; nr estimators = {parameters['n_estimators']}"
+        )
 
 
 def print_pre_parameters(pre_parameters):

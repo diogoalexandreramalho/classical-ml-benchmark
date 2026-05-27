@@ -34,9 +34,6 @@ class ClassifierConfig:
     def grid(self, source: str) -> dict:
         return HYPERPARAMS[source][self.key]["grid"]
 
-    def display(self, source: str):
-        return HYPERPARAMS[source][self.key]["display"]
-
 
 CONFIGS = [
     ClassifierConfig("Naive Bayes", GaussianNB, "naive_bayes"),
@@ -91,13 +88,13 @@ def classification(data, source):
 
     if is_binary:
         reports = [
-            [cfg.name, cfg.display(source), avg_accuracies[i], avg_recalls[i], cnf_mtxs[i]]
+            [cfg.name, cfg.defaults(source), avg_accuracies[i], avg_recalls[i], cnf_mtxs[i]]
             for i, cfg in enumerate(CONFIGS)
         ]
         stats.print_report(reports, (True, True))
     else:
         reports = [
-            [cfg.name, [cfg.display(source), avg_accuracies[i], cnf_mtxs[i]]]
+            [cfg.name, [cfg.defaults(source), avg_accuracies[i], cnf_mtxs[i]]]
             for i, cfg in enumerate(CONFIGS)
         ]
         stats.print_analysis_CT(reports, (True, True))

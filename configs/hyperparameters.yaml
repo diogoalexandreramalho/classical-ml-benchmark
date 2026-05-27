@@ -1,13 +1,11 @@
 # Hyperparameter config per dataset (PD / CT) and classifier:
-#   defaults — kwargs passed to the estimator for single training runs
+#   defaults — kwargs passed to the estimator for single training runs (also shown in report)
 #   grid     — search space for sweep() (GridSearchCV's param_grid)
-#   display  — positional values shown in the printed report
 
 PD:
   naive_bayes:
     defaults: {}
     grid: {}
-    display: GaussianNB
 
   knn:
     defaults:
@@ -17,7 +15,6 @@ PD:
       n_neighbors: [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 25, 31, 35, 40, 45,
                     50, 52, 55, 60, 70, 80, 90, 100, 105, 110, 120, 130, 140, 150]
       metric: [manhattan, euclidean, chebyshev]
-    display: [manhattan, 1]
 
   decision_tree:
     defaults:
@@ -28,7 +25,6 @@ PD:
       min_samples_leaf: [0.05, 0.025, 0.02, 0.015, 0.01, 0.0075, 0.005, 0.0025, 0.001]
       max_depth: [2, 3, 4, 5, 7, 10, 25, 30, 40, 50, 70, 100, 200, 400]
       criterion: [entropy, gini]
-    display: [entropy, 5, 0.05]
 
   random_forest:
     defaults:
@@ -39,7 +35,6 @@ PD:
       n_estimators: [5, 10, 25, 50, 75, 100, 150, 200, 250, 300, 350, 400, 450, 500]
       max_depth: [5, 10, 25, 40, 50, 60, 70]
       max_features: [sqrt, log2]
-    display: [sqrt, 10, 150]
 
   gradient_boost:
     defaults:
@@ -52,7 +47,6 @@ PD:
       n_estimators: [5, 10, 25, 50, 75, 100, 150, 200, 250, 300]
       max_depth: [5, 10, 25, 50]
       max_features: [sqrt, log2]
-    display: [sqrt, 5, 100, 0.1]
 
   xgboost:
     defaults:
@@ -61,13 +55,11 @@ PD:
     grid:
       n_estimators: [5, 10, 25, 50, 75, 100, 150, 200, 250, 300]
       max_depth: [5, 10, 25, 50]
-    display: [5, 200]
 
 CT:
   naive_bayes:
     defaults: {}
     grid: {}
-    display: GaussianNB
 
   knn:
     defaults:
@@ -76,7 +68,6 @@ CT:
     grid:
       n_neighbors: [1, 3, 10, 15, 17, 19, 31, 35, 50, 52, 55, 70, 90, 100, 120, 130, 150]
       metric: [manhattan, euclidean, chebyshev]
-    display: [manhattan, 1]
 
   decision_tree:
     defaults:
@@ -88,7 +79,6 @@ CT:
                          0.0002, 0.0001, 0.00008, 0.00005, 0.00003]
       max_depth: [10, 30, 50, 70, 100, 150, 200]
       criterion: [entropy, gini]
-    display: [entropy, 50, 0.00005]
 
   random_forest:
     defaults:
@@ -100,7 +90,6 @@ CT:
                      250, 300, 350, 400, 450, 500]
       max_depth: [5, 10, 25, 30, 40, 50, 60, 70]
       max_features: [sqrt, log2]
-    display: [sqrt, 25, 185]
 
   gradient_boost:
     defaults:
@@ -113,7 +102,6 @@ CT:
       n_estimators: [5, 20, 50, 100, 150, 200, 250, 300]
       max_depth: [5, 10, 25, 50]
       max_features: [sqrt, log2]
-    display: [sqrt, 10, 300, 0.05]
 
   xgboost:
     defaults:
@@ -122,4 +110,3 @@ CT:
     grid:
       n_estimators: [5, 10, 25, 50, 75, 100, 150, 200, 250, 300]
       max_depth: [5, 10, 25, 50]
-    display: [10, 300]
