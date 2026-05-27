@@ -1,91 +1,46 @@
+"""Run an XGBoost hyperparameter sweep on a dataset and print the best config."""
+
 import datetime
 import time
 
-import numpy as np
-import pandas as pd
 from sklearn.model_selection import train_test_split
 
 from data_science.datasets import DATASETS
-from data_science.models import xgboost_clf as xgb
+from data_science.pipeline import CONFIGS
 from data_science.preprocessing import data_balancing as balance
 from data_science.preprocessing import normalize as norm
-from data_science.viz import print_statistics as stats
+from data_science.train import sweep
+
+_CONFIGS_BY_KEY = {c.key: c for c in CONFIGS}
 
 
-def classification(data, source, analysis):
+def run_xgb_sweep(source: str) -> None:
+    """Preprocess the dataset (split + normalize + SMOTE-balance), then sweep XGBoost."""
+    data = DATASETS[source].read()
+    target = DATASETS[source].target_column
 
     if source == "CT":
-        # get 1000 samples per class and get new data set
-        data = data.groupby("Cover_Type").apply(lambda s: s.sample(1000))
-        target = "Cover_Type"
-    else:
-        target = "class"
+        # subsample 1000 per class for a tractable sweep
+        data = data.groupby(target).apply(lambda s: s.sample(1000))
 
-    balanced = True
-    normalized = True
-
-    # separates the dataset in training and testing sets
-    y: np.ndarray = data.pop(target).values
-    X: np.ndarray = data.values
-    labels: np.ndarray = pd.unique(y)
+    y = data.pop(target).values
+    X = data.values
 
     trnX, tstX, trnY, tstY = train_test_split(X, y, train_size=0.7, stratify=y)
-
-    # normalize and balance the dataset
     trnX, tstX, trnY, tstY = norm.standardScaler(trnX, tstX, trnY, tstY)
     trnX, trnY = balance.run(trnX, trnY, "all", 42, False)
 
-    if source == "PD":
-        start = time.time()
-        # find best model for each classifier
-        # print("NB")
-        # nb_report = nb.naive_bayes(trnX, tstX, trnY, tstY, labels, False)
-        # print("KNN")
-        # knn_report = knn.k_near_ngb(trnX, tstX, trnY, tstY, labels, True)
-        # print("DT")
-        # dt_report = dt.decision_tree(trnX, tstX, trnY, tstY, labels, True, False)
-        # print("RF")
-        # rf_report = rf.random_forest(trnX, tstX, trnY, tstY, labels, True)
-        # print("GB")
-        # gb_report = gb.gradient_boost(trnX, tstX, trnY, tstY, labels, True)
-        print("XGB")
-        xgb_report = xgb.xg_boost(trnX, tstX, trnY, tstY, labels, True)
-        end = time.time() - start
-        time1 = str(datetime.timedelta(seconds=end))
-        print("Time: " + time1)
-    else:
-        # find best model for each classifier
-        start = time.time()
-        # print("NB")
-        # nb_report = nb.naive_bayes_CT(trnX, tstX, trnY, tstY, labels)
-        # print("KNN")
-        # knn_report = knn.k_near_ngb_CT(trnX, tstX, trnY, tstY, labels, True)
-        # print("DT")
-        # dt_report = dt.decision_tree_CT(trnX, tstX, trnY, tstY, labels, True, False)
-        # print("RF")
-        # rf_report = rf.random_forest_CT(trnX, tstX, trnY, tstY, labels, True)
-        # print("GB")
-        # gb_report = gb.gradient_boost_CT(trnX, tstX, trnY, tstY, labels, True)
-        print("XGB")
-        xgb_report = xgb.xg_boost_CT(trnX, tstX, trnY, tstY, labels, True)
-        end = time.time() - start
-        time1 = str(datetime.timedelta(seconds=end))
-        print("Time: " + time1)
+    xgb_cfg = _CONFIGS_BY_KEY["xgboost"]
 
-    reports = [xgb_report]
-    # reports = [nb_report, knn_report, dt_report, rf_report, gb_report, xgb_report]
+    start = time.time()
+    result = sweep(xgb_cfg.estimator_cls, trnX, trnY, xgb_cfg.grid(source))
+    elapsed = str(datetime.timedelta(seconds=time.time() - start))
 
-    if source == "PD":
-        stats.print_analysis(reports, (balanced, normalized))
-    else:
-        stats.print_analysis_CT(reports, (balanced, normalized))
+    print(f"=== XGBoost sweep on {source} ===")
+    print(f"Best params:  {result.best_params_}")
+    print(f"Best score:   {result.best_score_:.4f}")
+    print(f"Elapsed:      {elapsed}")
 
 
-def produce_analysis():
-
-    data = DATASETS["CT"].read()
-
-    classification(data, "CT", True)
-
-
-produce_analysis()
+if __name__ == "__main__":
+    run_xgb_sweep("CT")

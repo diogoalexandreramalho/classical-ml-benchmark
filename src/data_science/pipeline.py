@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
@@ -17,57 +17,47 @@ from data_science.preprocessing import normalize as norm
 from data_science.train import train
 from data_science.viz import print_statistics as stats
 
-_SWEEPS_FILE = Path(__file__).resolve().parents[2] / "configs" / "sweeps.yaml"
-with _SWEEPS_FILE.open() as _f:
-    SWEEPS = yaml.safe_load(_f)
+_HYPERPARAMS_FILE = Path(__file__).resolve().parents[2] / "configs" / "hyperparameters.yaml"
+with _HYPERPARAMS_FILE.open() as _f:
+    HYPERPARAMS = yaml.safe_load(_f)
 
 
 @dataclass(frozen=True)
 class ClassifierConfig:
     name: str
     estimator_cls: type
-    call_params: dict = field(default_factory=dict)
-    param_grid_key: str = ""  # keys into SWEEPS[source]
-    display_params: tuple | str | None = None
+    key: str  # looks up HYPERPARAMS[source][key]
 
-    @property
-    def display(self):
-        if self.display_params is not None:
-            return self.display_params
-        return tuple(self.call_params.values())
+    def defaults(self, source: str) -> dict:
+        return HYPERPARAMS[source][self.key]["defaults"]
 
-    def param_grid(self, source: str) -> dict:
-        return SWEEPS[source].get(self.param_grid_key, {})
+    def grid(self, source: str) -> dict:
+        return HYPERPARAMS[source][self.key]["grid"]
+
+    def display(self, source: str):
+        return HYPERPARAMS[source][self.key]["display"]
 
 
-# fmt: off
-# CT display_params drift from call_params on DT/RF/GB/XGB — preserved as-is from the
-# original; the printed report shows tuned values that aren't what training actually used.
-PD_CONFIGS = [
-    ClassifierConfig("Naive Bayes",       GaussianNB,                  {},                                                                                   "naive_bayes",     "GaussianNB"),
-    ClassifierConfig("kNN",               KNeighborsClassifier,        {"n_neighbors": 1, "metric": "manhattan"},                                            "knn",             ("manhattan", 1)),
-    ClassifierConfig("Decision Tree",     DecisionTreeClassifier,      {"min_samples_leaf": 0.05, "max_depth": 5, "criterion": "entropy"},                   "decision_tree",   ("entropy", 5, 0.05)),
-    ClassifierConfig("Random Forest",     RandomForestClassifier,      {"n_estimators": 150, "max_depth": 10, "max_features": "sqrt"},                       "random_forest",   ("sqrt", 10, 150)),
-    ClassifierConfig("Gradient Boosting", GradientBoostingClassifier,  {"n_estimators": 100, "learning_rate": 0.1, "max_depth": 5, "max_features": "sqrt"},  "gradient_boost",  ("sqrt", 5, 100, 0.1)),
-    ClassifierConfig("XGBoost",           XGBClassifier,               {"n_estimators": 200, "max_depth": 5},                                                "xgboost",         (5, 200)),
+CONFIGS = [
+    ClassifierConfig("Naive Bayes", GaussianNB, "naive_bayes"),
+    ClassifierConfig("kNN", KNeighborsClassifier, "knn"),
+    ClassifierConfig("Decision Tree", DecisionTreeClassifier, "decision_tree"),
+    ClassifierConfig("Random Forest", RandomForestClassifier, "random_forest"),
+    ClassifierConfig("Gradient Boosting", GradientBoostingClassifier, "gradient_boost"),
+    ClassifierConfig("XGBoost", XGBClassifier, "xgboost"),
 ]
 
-CT_CONFIGS = [
-    ClassifierConfig("Naive Bayes",       GaussianNB,                  {},                                                                                   "naive_bayes",     "GaussianNB"),
-    ClassifierConfig("kNN",               KNeighborsClassifier,        {"n_neighbors": 1, "metric": "manhattan"},                                            "knn",             ("manhattan", 1)),
-    ClassifierConfig("Decision Tree",     DecisionTreeClassifier,      {"min_samples_leaf": 0.05, "max_depth": 5, "criterion": "entropy"},                   "decision_tree",   ("entropy", 50, 0.00005)),
-    ClassifierConfig("Random Forest",     RandomForestClassifier,      {"n_estimators": 150, "max_depth": 10, "max_features": "sqrt"},                       "random_forest",   ("sqrt", 25, 185)),
-    ClassifierConfig("Gradient Boosting", GradientBoostingClassifier,  {"n_estimators": 100, "learning_rate": 0.1, "max_depth": 5, "max_features": "sqrt"},  "gradient_boost",  ("sqrt", 10, 300, 0.05)),
-    ClassifierConfig("XGBoost",           XGBClassifier,               {"n_estimators": 200, "max_depth": 5},                                                "xgboost",         (10, 300)),
-]
-# fmt: on
+_CONFIGS_BY_KEY = {c.key: c for c in CONFIGS}
 
-CONFIGS_BY_SOURCE = {"PD": PD_CONFIGS, "CT": CT_CONFIGS}
+
+def get_classifier(key: str, source: str):
+    """Instantiate a configured classifier (by YAML key) with its defaults for the given source."""
+    cfg = _CONFIGS_BY_KEY[key]
+    return cfg.estimator_cls(**cfg.defaults(source))
 
 
 def classification(data, source):
     target = DATASETS[source].target_column
-    configs = CONFIGS_BY_SOURCE[source]
 
     # split features / target
     data = data.apply(pd.to_numeric)
@@ -77,10 +67,10 @@ def classification(data, source):
     n_classes = len(labels)
     is_binary = n_classes == 2
 
-    # per-classifier accumulators (parallel to configs)
-    accuracies: list[list[float]] = [[] for _ in configs]
-    recalls: list[list[float]] = [[] for _ in configs]
-    cnf_mtxs = [np.zeros((n_classes, n_classes), dtype=int) for _ in configs]
+    # per-classifier accumulators (parallel to CONFIGS)
+    accuracies: list[list[float]] = [[] for _ in CONFIGS]
+    recalls: list[list[float]] = [[] for _ in CONFIGS]
+    cnf_mtxs = [np.zeros((n_classes, n_classes), dtype=int) for _ in CONFIGS]
 
     cv = KFold(n_splits=10, random_state=42, shuffle=True)
     for train_index, test_index in cv.split(X):
@@ -88,8 +78,8 @@ def classification(data, source):
         trnX, tstX, trnY, tstY = norm.standardScaler(trnX, tstX, trnY, tstY)
         trnX, trnY = balance.run(trnX, trnY, "all", 42, False)
 
-        for i, cfg in enumerate(configs):
-            estimator = cfg.estimator_cls(**cfg.call_params)
+        for i, cfg in enumerate(CONFIGS):
+            estimator = cfg.estimator_cls(**cfg.defaults(source))
             acc, recall, cnf = train(estimator, trnX, tstX, trnY, tstY, labels)
             accuracies[i].append(acc)
             if recall is not None:
@@ -101,13 +91,13 @@ def classification(data, source):
 
     if is_binary:
         reports = [
-            [cfg.name, cfg.display, avg_accuracies[i], avg_recalls[i], cnf_mtxs[i]]
-            for i, cfg in enumerate(configs)
+            [cfg.name, cfg.display(source), avg_accuracies[i], avg_recalls[i], cnf_mtxs[i]]
+            for i, cfg in enumerate(CONFIGS)
         ]
         stats.print_report(reports, (True, True))
     else:
         reports = [
-            [cfg.name, [cfg.display, avg_accuracies[i], cnf_mtxs[i]]]
-            for i, cfg in enumerate(configs)
+            [cfg.name, [cfg.display(source), avg_accuracies[i], cnf_mtxs[i]]]
+            for i, cfg in enumerate(CONFIGS)
         ]
         stats.print_analysis_CT(reports, (True, True))

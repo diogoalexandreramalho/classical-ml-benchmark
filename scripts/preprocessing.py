@@ -14,11 +14,10 @@ from sklearn.feature_selection import (
 )
 from sklearn.model_selection import train_test_split
 
-from data_science.models import decision_tree as dt
-from data_science.models import knn
-from data_science.models import naive_bayes as nb
+from data_science.pipeline import get_classifier
 from data_science.preprocessing import data_balancing as balance
 from data_science.preprocessing import normalize as norm
+from data_science.train import train
 
 #
 #
@@ -331,21 +330,21 @@ def classify_balance(trnX, tstX, trnY, tstY, labels, clf, bal, name):
     # classify
     if clf == "Naive_Bayes":
         if name == "PD":
-            return nb.simple_naive_bayes(trnX, tstX, trnY, tstY, labels)
+            return train(get_classifier("naive_bayes", name), trnX, tstX, trnY, tstY, labels)
         else:
-            return nb.simple_naive_bayes_CT(trnX, tstX, trnY, tstY, labels)
+            return train(get_classifier("naive_bayes", name), trnX, tstX, trnY, tstY, labels)
 
     elif clf == "KNN":
         if name == "PD":
-            return knn.simple_knn(trnX, tstX, trnY, tstY, 1, "manhattan", labels)
+            return train(get_classifier("knn", name), trnX, tstX, trnY, tstY, labels)
         else:
-            return knn.simple_knn_CT(trnX, tstX, trnY, tstY, 1, "manhattan", labels)
+            return train(get_classifier("knn", name), trnX, tstX, trnY, tstY, labels)
 
     elif clf == "Decision_Tree":
         if name == "PD":
-            return dt.simple_decision_tree(trnX, tstX, trnY, tstY, 0.05, 5, "entropy", labels)
+            return train(get_classifier("decision_tree", name), trnX, tstX, trnY, tstY, labels)
         else:
-            return dt.simple_decision_tree_CT(trnX, tstX, trnY, tstY, 0.05, 5, "entropy", labels)
+            return train(get_classifier("decision_tree", name), trnX, tstX, trnY, tstY, labels)
 
 
 def classify_normalization(trnX, tstX, trnY, tstY, labels, clf, n, name):
@@ -365,21 +364,21 @@ def classify_normalization(trnX, tstX, trnY, tstY, labels, clf, n, name):
     # classify
     if clf == "Naive_Bayes":
         if name == "PD":
-            return nb.simple_naive_bayes(trnX, tstX, trnY, tstY, labels)
+            return train(get_classifier("naive_bayes", name), trnX, tstX, trnY, tstY, labels)
         else:
-            return nb.simple_naive_bayes_CT(trnX, tstX, trnY, tstY, labels)
+            return train(get_classifier("naive_bayes", name), trnX, tstX, trnY, tstY, labels)
 
     elif clf == "KNN":
         if name == "PD":
-            return knn.simple_knn(trnX, tstX, trnY, tstY, 1, "manhattan", labels)
+            return train(get_classifier("knn", name), trnX, tstX, trnY, tstY, labels)
         else:
-            return knn.simple_knn_CT(trnX, tstX, trnY, tstY, 1, "manhattan", labels)
+            return train(get_classifier("knn", name), trnX, tstX, trnY, tstY, labels)
 
     elif clf == "Decision_Tree":
         if name == "PD":
-            return dt.simple_decision_tree(trnX, tstX, trnY, tstY, 0.05, 5, "entropy", labels)
+            return train(get_classifier("decision_tree", name), trnX, tstX, trnY, tstY, labels)
         else:
-            return dt.simple_decision_tree_CT(trnX, tstX, trnY, tstY, 0.05, 5, "entropy", labels)
+            return train(get_classifier("decision_tree", name), trnX, tstX, trnY, tstY, labels)
 
 
 def classify_feature_selection(X, y, clf, name):
@@ -393,15 +392,15 @@ def classify_feature_selection(X, y, clf, name):
 
     if clf == "Naive_Bayes":
         if name == "PD":
-            return nb.simple_naive_bayes(trnX, tstX, trnY, tstY, labels)
+            return train(get_classifier("naive_bayes", name), trnX, tstX, trnY, tstY, labels)
         else:
-            return nb.simple_naive_bayes_CT(trnX, tstX, trnY, tstY, labels)
+            return train(get_classifier("naive_bayes", name), trnX, tstX, trnY, tstY, labels)
 
     elif clf == "KNN":
         if name == "PD":
-            return knn.simple_knn(trnX, tstX, trnY, tstY, 1, "manhattan", labels)
+            return train(get_classifier("knn", name), trnX, tstX, trnY, tstY, labels)
         else:
-            return knn.simple_knn_CT(trnX, tstX, trnY, tstY, 1, "manhattan", labels)
+            return train(get_classifier("knn", name), trnX, tstX, trnY, tstY, labels)
 
 
 def classify_pca(dataset, clf, name):
@@ -425,15 +424,15 @@ def classify_pca(dataset, clf, name):
 
     if clf == "Naive_Bayes":
         if name == "PD":
-            return nb.simple_naive_bayes(trnX, tstX, trnY, tstY, labels)
+            return train(get_classifier("naive_bayes", name), trnX, tstX, trnY, tstY, labels)
         else:
-            return nb.simple_naive_bayes_CT(trnX, tstX, trnY, tstY, labels)
+            return train(get_classifier("naive_bayes", name), trnX, tstX, trnY, tstY, labels)
 
     elif clf == "KNN":
         if name == "PD":
-            return knn.simple_knn(trnX, tstX, trnY, tstY, 1, "manhattan", labels)
+            return train(get_classifier("knn", name), trnX, tstX, trnY, tstY, labels)
         else:
-            return knn.simple_knn_CT(trnX, tstX, trnY, tstY, 1, "manhattan", labels)
+            return train(get_classifier("knn", name), trnX, tstX, trnY, tstY, labels)
 
 
 #
