@@ -1,20 +1,23 @@
+"""Classification pipeline: cross-validate every configured classifier with preprocessing."""
+
 from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import yaml
+from imblearn.over_sampling import SMOTE
+from imblearn.pipeline import Pipeline
 from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
-from sklearn.model_selection import KFold
+from sklearn.metrics import accuracy_score, confusion_matrix, recall_score
+from sklearn.model_selection import KFold, cross_val_predict
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.preprocessing import StandardScaler
 from sklearn.tree import DecisionTreeClassifier
 from xgboost import XGBClassifier
 
 from data_science.datasets import DATASETS
-from data_science.preprocessing import data_balancing as balance
-from data_science.preprocessing import normalize as norm
-from data_science.train import train
 from data_science.viz import print_statistics as stats
 
 _HYPERPARAMS_FILE = Path(__file__).resolve().parents[2] / "configs" / "hyperparameters.yaml"
@@ -55,51 +58,35 @@ def get_classifier(key: str, source: str):
 
 def classification(data, source):
     target = DATASETS[source].target_column
-
-    # split features / target
     data = data.apply(pd.to_numeric)
-    y: np.ndarray = data.pop(target).values.astype(int)
-    X: np.ndarray = data.values.astype(float)
-    labels: np.ndarray = pd.unique(y)
-    n_classes = len(labels)
-    is_binary = n_classes == 2
+    y = data.pop(target).values.astype(int)
+    X = data.values.astype(float)
+    labels = np.unique(y)
+    is_binary = len(labels) == 2
 
-    # per-classifier accumulators (parallel to CONFIGS)
-    accuracies: list[list[float]] = [[] for _ in CONFIGS]
-    recalls: list[list[float]] = [[] for _ in CONFIGS]
-    cnf_mtxs = [np.zeros((n_classes, n_classes), dtype=int) for _ in CONFIGS]
-
-    cv = KFold(n_splits=10, random_state=42, shuffle=True)
-    for train_index, test_index in cv.split(X):
-        X_train, X_test, y_train, y_test = (
-            X[train_index],
-            X[test_index],
-            y[train_index],
-            y[test_index],
+    cv = KFold(n_splits=10, shuffle=True, random_state=42)
+    reports = []
+    for cfg in CONFIGS:
+        pipe = Pipeline(
+            [
+                ("scale", StandardScaler()),
+                ("smote", SMOTE(sampling_strategy="all", random_state=42)),
+                ("clf", cfg.estimator_cls(**cfg.defaults(source))),
+            ]
         )
-        X_train, X_test, y_train, y_test = norm.standard_scaler(X_train, X_test, y_train, y_test)
-        X_train, y_train = balance.run(X_train, y_train, "all", 42, False)
-
-        for i, cfg in enumerate(CONFIGS):
-            estimator = cfg.estimator_cls(**cfg.defaults(source))
-            acc, recall, cnf = train(estimator, X_train, X_test, y_train, y_test, labels)
-            accuracies[i].append(acc)
-            if recall is not None:
-                recalls[i].append(recall)
-            cnf_mtxs[i] = np.add(cnf_mtxs[i], cnf)
-
-    avg_accuracies = [sum(a) / len(a) for a in accuracies]
-    avg_recalls = [sum(r) / len(r) for r in recalls] if is_binary else None
+        y_pred = cross_val_predict(pipe, X, y, cv=cv, n_jobs=-1)
+        reports.append(
+            (
+                cfg,
+                accuracy_score(y, y_pred),
+                recall_score(y, y_pred) if is_binary else None,
+                confusion_matrix(y, y_pred, labels=labels),
+            )
+        )
 
     if is_binary:
-        reports = [
-            [cfg.name, cfg.defaults(source), avg_accuracies[i], avg_recalls[i], cnf_mtxs[i]]
-            for i, cfg in enumerate(CONFIGS)
-        ]
-        stats.print_report(reports, (True, True))
+        rows = [[cfg.name, cfg.defaults(source), acc, rec, cm] for cfg, acc, rec, cm in reports]
+        stats.print_report(rows, (True, True))
     else:
-        reports = [
-            [cfg.name, [cfg.defaults(source), avg_accuracies[i], cnf_mtxs[i]]]
-            for i, cfg in enumerate(CONFIGS)
-        ]
-        stats.print_analysis_CT(reports, (True, True))
+        rows = [[cfg.name, [cfg.defaults(source), acc, cm]] for cfg, acc, _, cm in reports]
+        stats.print_analysis_CT(rows, (True, True))
