@@ -135,3 +135,33 @@ def plot_confusion_matrix(
     fmt = ".2f" if normalize else "d"
     for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
         ax.text(j, i, format(cm[i, j], fmt), horizontalalignment="center")
+
+
+def plot_balance_strategies(y, ax=None):
+    """Bar chart comparing class counts under four balancing strategies (binary only).
+
+    All four strategies are derived arithmetically from the original class distribution —
+    no actual resampling is performed. Use to inspect class imbalance and decide whether
+    (and how) to rebalance.
+    """
+    classes, counts = np.unique(y, return_counts=True)
+    if len(classes) != 2:
+        raise ValueError(f"binary-only; got {len(classes)} classes")
+    min_count = int(counts.min())
+    max_count = int(counts.max())
+    strategies = {
+        "Original": counts.tolist(),
+        "Undersample": [min_count, min_count],
+        "Oversample": [max_count, max_count],
+        "SMOTE": [max_count, max_count],
+    }
+    if ax is None:
+        _, ax = plt.subplots()
+    multiple_bar_chart(
+        ax,
+        [str(c) for c in classes],
+        strategies,
+        title="Class balance",
+        xlabel="class",
+        ylabel="count",
+    )
