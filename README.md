@@ -101,8 +101,8 @@ Stage 2 + classifier sweeps dominate.
 For a fully containerised reproduction (no local Python or TeX required):
 
 ```bash
-docker build -t data-science .
-docker run --rm -v "$(pwd)/artifacts:/app/artifacts" data-science make reproduce
+docker build -t cml-bench .
+docker run --rm -v "$(pwd)/artifacts:/app/artifacts" cml-bench make reproduce
 ```
 
 You can also run each stage individually:
@@ -119,13 +119,13 @@ make test        # uv run pytest
 The pipeline is also addressable directly via the installed CLI:
 
 ```bash
-uv run data-science --help
-uv run data-science download --dataset PD
-uv run data-science stage-1 --config configs/parkinsons.yaml
-uv run data-science sweeps  --config configs/parkinsons.yaml
-uv run data-science stage-2 --config configs/parkinsons.yaml
-uv run data-science final   --config configs/parkinsons.yaml
-uv run data-science reproduce
+uv run cml-bench --help
+uv run cml-bench download --dataset PD
+uv run cml-bench stage-1 --config configs/parkinsons.yaml
+uv run cml-bench sweeps  --config configs/parkinsons.yaml
+uv run cml-bench stage-2 --config configs/parkinsons.yaml
+uv run cml-bench final   --config configs/parkinsons.yaml
+uv run cml-bench reproduce
 ```
 
 
@@ -157,7 +157,7 @@ tables, sweep figures, and confusion matrices.
 ## Repository layout
 
 ```
-data-science/
+cml-bench/
 ├── README.md                         # This file
 ├── Makefile                          # Reproduction targets
 ├── pyproject.toml + uv.lock          # Dependencies (managed via uv)
@@ -219,7 +219,7 @@ relevant config (`configs/{parkinsons,covertype}.yaml`) and authenticating:
 
 ```bash
 uv run wandb login                # one-time, paste API key from https://wandb.ai/authorize
-make stage1                       # runs are logged to https://wandb.ai/<entity>/data-science
+make stage1                       # runs are logged to https://wandb.ai/<entity>/cml-bench
 ```
 
 For local-only runs without a W&B account: `WANDB_MODE=offline make stage1`.

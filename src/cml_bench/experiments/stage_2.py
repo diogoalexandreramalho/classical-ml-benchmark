@@ -32,7 +32,7 @@ def run_stage_2(config_path: str | Path) -> pd.DataFrame:
     if not stage_1_path.exists():
         raise FileNotFoundError(
             f"Stage 1 results not found at {stage_1_path}. "
-            f"Run `data-science stage-1 --config {config_path}` first."
+            f"Run `cml-bench stage-1 --config {config_path}` first."
         )
     stage_1_results = pd.read_csv(stage_1_path)
 

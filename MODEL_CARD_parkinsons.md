@@ -108,8 +108,8 @@ make install && make download && make reproduce
 Or via Docker:
 
 ```bash
-docker build -t data-science . && \
-  docker run --rm -v "$(pwd)/artifacts:/app/artifacts" data-science make reproduce
+docker build -t cml-bench . && \
+  docker run --rm -v "$(pwd)/artifacts:/app/artifacts" cml-bench make reproduce
 ```
 
 Regenerates the model and all metrics quoted above. Random seed 42 throughout.

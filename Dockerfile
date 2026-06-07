@@ -1,13 +1,13 @@
-# Reproducible container for the data-science pipeline.
+# Reproducible container for the cml-bench pipeline.
 #
 # Build:
-#   docker build -t data-science .
+#   docker build -t cml-bench .
 #
 # Reproduce the full report (writes to ./artifacts on the host):
-#   docker run --rm -v "$(pwd)/artifacts:/app/artifacts" data-science make reproduce
+#   docker run --rm -v "$(pwd)/artifacts:/app/artifacts" cml-bench make reproduce
 #
 # Drop into a shell:
-#   docker run --rm -it -v "$(pwd)/artifacts:/app/artifacts" data-science bash
+#   docker run --rm -it -v "$(pwd)/artifacts:/app/artifacts" cml-bench bash
 
 FROM python:3.11-slim AS base
 

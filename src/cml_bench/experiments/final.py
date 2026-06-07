@@ -49,7 +49,7 @@ def run_final_evaluation(config_path: str | Path) -> dict[str, Any]:
     if not tuning_path.exists():
         raise FileNotFoundError(
             f"Tuning results not found at {tuning_path}. "
-            f"Run `data-science stage-2 --config {config_path}` first."
+            f"Run `cml-bench stage-2 --config {config_path}` first."
         )
     tuning_results = pd.read_csv(tuning_path)
     tuning_results["best_params"] = tuning_results["best_params"].apply(_parse_params)

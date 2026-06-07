@@ -34,7 +34,7 @@ dev = [
 ]
 
 [project.scripts]
-data-science = "cml_bench.main:main"
+cml-bench = "cml_bench.main:main"
 
 [tool.ruff]
 line-length = 100

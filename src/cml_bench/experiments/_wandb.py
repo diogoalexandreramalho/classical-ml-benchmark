@@ -47,7 +47,7 @@ def init(ctx, stage_name: str):
         return None
 
     cfg = ctx.cfg.get("wandb", {})
-    project = cfg.get("project", "data-science")
+    project = cfg.get("project", "cml-bench")
     entity = cfg.get("entity") or None
 
     return wandb.init(

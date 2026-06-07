@@ -17,24 +17,24 @@ install:
 	uv sync --frozen
 
 download:
-	uv run data-science download --dataset PD
-	uv run data-science download --dataset CT
+	uv run cml-bench download --dataset PD
+	uv run cml-bench download --dataset CT
 
 stage1:
-	uv run data-science stage-1 --config configs/parkinsons.yaml
-	uv run data-science stage-1 --config configs/covertype.yaml
+	uv run cml-bench stage-1 --config configs/parkinsons.yaml
+	uv run cml-bench stage-1 --config configs/covertype.yaml
 
 sweeps:
-	uv run data-science sweeps --config configs/parkinsons.yaml
-	uv run data-science sweeps --config configs/covertype.yaml
+	uv run cml-bench sweeps --config configs/parkinsons.yaml
+	uv run cml-bench sweeps --config configs/covertype.yaml
 
 stage2:
-	uv run data-science stage-2 --config configs/parkinsons.yaml
-	uv run data-science stage-2 --config configs/covertype.yaml
+	uv run cml-bench stage-2 --config configs/parkinsons.yaml
+	uv run cml-bench stage-2 --config configs/covertype.yaml
 
 final:
-	uv run data-science final --config configs/parkinsons.yaml
-	uv run data-science final --config configs/covertype.yaml
+	uv run cml-bench final --config configs/parkinsons.yaml
+	uv run cml-bench final --config configs/covertype.yaml
 
 report:
 	cd reports && pdflatex -interaction=nonstopmode report.tex && pdflatex -interaction=nonstopmode report.tex
