@@ -1,12 +1,10 @@
-# Parkinson's Disease & Forest Cover Type Classification
+# Reproducible Machine Learning Benchmark: Parkinson’s Disease and Forest Cover Type Classification
 
 [![CI](https://github.com/diogoalexandreramalho/data-science/actions/workflows/ci.yml/badge.svg)](https://github.com/diogoalexandreramalho/data-science/actions/workflows/ci.yml)
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/release/python-3110/)
 
-A reproducible ML study on two contrasting tabular classification
-problems: detecting Parkinson's disease from speech features (binary,
-high-dimensional, mildly imbalanced) and predicting forest cover type from
-cartographic data (multiclass, seven balanced classes). 
+This repository presents a reproducible comparative study of machine learning models on two contrasting tabular classification tasks: 
+Parkinson’s disease detection from high-dimensional speech features and forest cover type prediction from cartographic data. 
 The full report is in [`reports/report.pdf`](reports/report.pdf).
 
 ## Overview
