@@ -24,7 +24,6 @@ Usage pattern in each pipeline stage:
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 from typing import Any
 
@@ -50,9 +49,6 @@ def init(ctx, stage_name: str):
     cfg = ctx.cfg.get("wandb", {})
     project = cfg.get("project", "data-science")
     entity = cfg.get("entity") or None
-
-    # Suppress wandb's verbose import-time noise when running CI/tests
-    os.environ.setdefault("WANDB_SILENT", "true")
 
     return wandb.init(
         project=project,
