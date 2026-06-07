@@ -1,0 +1,26 @@
+# Keep build context small
+.git/
+.github/
+.venv/
+.ruff_cache/
+.pytest_cache/
+__pycache__/
+*.pyc
+.DS_Store
+
+# Data + artifacts (regenerable; bind-mount or generate inside the container)
+data/raw/
+artifacts/
+
+# LaTeX build artefacts
+reports/*.aux
+reports/*.log
+reports/*.toc
+reports/*.out
+reports/*.fls
+reports/*.fdb_latexmk
+reports/*.synctex.gz
+
+# Editor / IDE
+.idea/
+.vscode/

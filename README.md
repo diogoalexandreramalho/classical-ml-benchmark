@@ -3,8 +3,8 @@
 [![CI](https://github.com/diogoalexandreramalho/data-science/actions/workflows/ci.yml/badge.svg)](https://github.com/diogoalexandreramalho/data-science/actions/workflows/ci.yml)
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/release/python-3110/)
 
-This repository presents a reproducible comparative study of machine learning models on two contrasting tabular classification tasks: 
-Parkinson’s disease detection from high-dimensional speech features and forest cover type prediction from cartographic data. 
+This repository presents a reproducible comparative study of machine learning models on two contrasting tabular classification tasks:
+Parkinson’s disease detection from high-dimensional speech features and forest cover type prediction from cartographic data.
 The full report is in [`reports/report.pdf`](reports/report.pdf).
 
 ## Overview
@@ -97,6 +97,13 @@ make reproduce   # stage_1 -> sweeps -> stage_2 -> final, for both datasets, the
 classifier-hyperparameter sweeps → grid-search tuning → held-out evaluation
 → LaTeX compile). Roughly 30–60 minutes on a modern laptop; Covertype's
 Stage 2 + classifier sweeps dominate.
+
+For a fully containerised reproduction (no local Python or TeX required):
+
+```bash
+docker build -t data-science .
+docker run --rm -v "$(pwd)/artifacts:/app/artifacts" data-science make reproduce
+```
 
 You can also run each stage individually:
 
@@ -192,14 +199,15 @@ data-science/
 ## Development
 
 ```bash
-uv sync                 # install runtime + dev dependencies
-uv run ruff check .     # lint
-uv run ruff format .    # format
-uv run pytest -q        # run tests
+uv sync --group dev          # install runtime + dev dependencies
+uv run pre-commit install    # set up the pre-commit hooks (one-time)
+uv run ruff check .          # lint
+uv run ruff format .         # format
+uv run pytest -q             # run tests
 ```
 
-CI (`.github/workflows/lint.yml`) runs `ruff check` and `ruff format --check`
-on every push and pull request.
+CI (`.github/workflows/ci.yml`) runs `ruff check`, `ruff format --check`,
+and `pytest` on every push and pull request.
 
 ## Tech stack
 

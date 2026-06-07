@@ -1,4 +1,17 @@
-.PHONY: install download stage1 stage2 sweeps final report test reproduce clean
+.PHONY: help install download stage1 stage2 sweeps final report test reproduce clean
+
+help:
+	@echo "Targets:"
+	@echo "  install     uv sync --frozen"
+	@echo "  download    fetch both UCI datasets into data/raw/"
+	@echo "  stage1      Stage 1 preprocessing matrix (PD + CT)"
+	@echo "  sweeps      Preprocessing + classifier hyperparameter sweeps (PD + CT)"
+	@echo "  stage2      Stage 2 GridSearchCV (PD + CT)"
+	@echo "  final       Stage 3 held-out test evaluation (PD + CT)"
+	@echo "  report      Build reports/report.pdf"
+	@echo "  reproduce   install + download + stage1 + sweeps + stage2 + final + report"
+	@echo "  test        Run pytest"
+	@echo "  clean       Remove LaTeX build files + artifacts/scratch"
 
 install:
 	uv sync --frozen
