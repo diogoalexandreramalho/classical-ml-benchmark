@@ -24,6 +24,10 @@ data/processed/**
 artifacts/scratch/
 results/scratch/
 
+# Versioned model history is kept local-only (W&B Artifacts version remotely);
+# the canonical artifacts/final/<dataset>/model.joblib pointer stays tracked.
+artifacts/final/*/models/
+
 # Weights & Biases local run dirs (offline runs land here)
 wandb/
 

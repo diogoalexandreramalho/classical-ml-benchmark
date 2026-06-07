@@ -12,6 +12,8 @@ from __future__ import annotations
 
 import ast
 import json
+import shutil
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -55,7 +57,13 @@ def run_final_evaluation(config_path: str | Path) -> dict[str, Any]:
     wandb_run = _wandb.init(ctx, stage_name="final")
     try:
         confusion_path = ctx.output_dir / "confusion_matrix.png"
-        model_path = ctx.output_dir / "model.joblib"
+        # Versioned model history under models/; `model.joblib` is the latest pointer.
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        models_dir = ctx.output_dir / "models"
+        models_dir.mkdir(parents=True, exist_ok=True)
+        versioned_model_path = models_dir / f"model_{timestamp}.joblib"
+        latest_model_path = ctx.output_dir / "model.joblib"
+
         result = run_final(
             tuning_results=tuning_results,
             X_train=ctx.X_train,
@@ -69,8 +77,9 @@ def run_final_evaluation(config_path: str | Path) -> dict[str, Any]:
             confusion_matrix_path=confusion_path,
             continuous_columns=ctx.continuous_columns,
             confusion_matrix_title=f"{ctx.name} best model — held-out test",
-            model_path=model_path,
+            model_path=versioned_model_path,
         )
+        shutil.copyfile(versioned_model_path, latest_model_path)
 
         classification_report = result["metrics"]["classification_report"]
         final_metrics = {
@@ -86,7 +95,8 @@ def run_final_evaluation(config_path: str | Path) -> dict[str, Any]:
         final_path.write_text(json.dumps(final_metrics, indent=2, default=str))
         print(f"  wrote {final_path}")
         print(f"  wrote {confusion_path}")
-        print(f"  wrote {model_path}")
+        print(f"  wrote {versioned_model_path}")
+        print(f"  wrote {latest_model_path} (latest -> {versioned_model_path.name})")
 
         per_class_path: Path | None = None
         if not ctx.is_binary:
@@ -132,7 +142,9 @@ def run_final_evaluation(config_path: str | Path) -> dict[str, Any]:
         _wandb.log_image(wandb_run, confusion_path, "test/confusion_matrix")
         if per_class_path is not None:
             _wandb.log_dataframe(wandb_run, pd.read_csv(per_class_path), "test/per_class")
-        _wandb.log_artifact(wandb_run, model_path, name=f"{ctx.name}-model", artifact_type="model")
+        _wandb.log_artifact(
+            wandb_run, versioned_model_path, name=f"{ctx.name}-model", artifact_type="model"
+        )
 
         return result
     finally:
