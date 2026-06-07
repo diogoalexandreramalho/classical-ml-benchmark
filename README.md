@@ -3,13 +3,16 @@
 [![CI](https://github.com/diogoalexandreramalho/data-science/actions/workflows/ci.yml/badge.svg)](https://github.com/diogoalexandreramalho/data-science/actions/workflows/ci.yml)
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/release/python-3110/)
 
-End-to-end comparative ML study on two contrasting tabular classification
+A reproducible ML study on two contrasting tabular classification
 problems: detecting Parkinson's disease from speech features (binary,
 high-dimensional, mildly imbalanced) and predicting forest cover type from
-cartographic data (multiclass, seven balanced classes). The full report is
-in [`reports/report.pdf`](reports/report.pdf).
+cartographic data (multiclass, seven balanced classes). 
+The full report is in [`reports/report.pdf`](reports/report.pdf).
 
 ## Overview
+
+### Datasets
+
 
 | | Parkinson's Disease | Forest Covertype |
 |---|---|---|
@@ -20,7 +23,40 @@ in [`reports/report.pdf`](reports/report.pdf).
 | **Primary metric** | F1 (positive class) | Macro F1 |
 | **CV** | 10-fold stratified group (patient-aware) | 10-fold stratified |
 
-## Results
+
+**Parkinson's Disease** — speech recordings from 188 PD patients and 64
+healthy controls (Istanbul University). 754 features extracted via MFCCs,
+wavelet transforms, vocal fold features, and Tunable Q-Factor Wavelet
+Transform (TQWT). Patient-aware cross-validation prevents leakage from
+multiple recordings per patient.
+
+**Forest Covertype** — cartographic data from the US Forest Service for
+30×30 m cells. 10 continuous features (elevation, slope, distances) plus
+44 one-hot encoded soil-type and wilderness-area indicators. Target is one
+of 7 tree species. The full dataset is heavily imbalanced; experiments use
+a balanced subsample of 1,000 records per class (7,000 total).
+
+### Methodology
+
+A three-stage pipeline evaluates six classical classifiers — Naïve Bayes,
+kNN, Decision Tree, Random Forest, Gradient Boosting, XGBoost — across
+multiple preprocessing configurations (raw, scaled, scaled + feature
+selection, scaled + PCA on PD).
+
+1. **Stage 1** — 10-fold CV of every (preprocessing × classifier) cell at
+   default hyperparameters. Selects each classifier's best preprocessing.
+2. **Stage 2** — per-classifier grid search on its Stage-1-best preprocessing.
+   Selects each classifier's best hyperparameters.
+3. **Final** — refit the overall winner on the full training set, evaluate
+   on a held-out 20% test split.
+
+In parallel, a **sweeps** step produces the report's analytical figures
+(feature-selection sweeps, PCA sweeps, per-classifier hyperparameter sweeps).
+Patient-grouped CV on Parkinson's prevents leakage from multiple recordings
+per patient. Random seed = 42 throughout.
+
+
+### Results
 
 Cross-validation primary-metric scores after Stage-2 hyperparameter tuning,
 per classifier and dataset.
@@ -34,8 +70,7 @@ per classifier and dataset.
 | XGBoost | 0.8880 | 0.8281 |
 | **Gradient Boosting (chosen)** | **0.8997** | **0.8285** |
 
-**Final held-out test evaluation** (chosen model refit on full training set,
-evaluated on the 20% held-out split):
+**Final held-out test evaluation:**
 
 | Metric | Parkinson's | Covertype |
 |---|---|---|
@@ -88,21 +123,6 @@ uv run data-science final   --config configs/parkinsons.yaml
 uv run data-science reproduce
 ```
 
-### Pipeline stages — what each does
-
-| Stage | CLI | Output | Used by |
-|---|---|---|---|
-| **Stage 1** | `stage-1` | Preprocessing × classifier CV matrix at defaults | `stage_1_results.csv` → picks each classifier's best preprocessing |
-| **Sweeps** | `sweeps` | Analytical curves (FS sweep, PCA sweep, per-classifier hyperparam sweeps, per-class breakdown) | The report's analytical figures |
-| **Stage 2** | `stage-2` | Per-classifier GridSearchCV on Stage-1-best preprocessing | `tuning_results.csv` → picks each classifier's best hyperparameters |
-| **Stage 3** | `final` | Refit overall winner on full train, evaluate on held-out test | `final_metrics.json` + `confusion_matrix.png` |
-
-Sweeps and Stage 2 both run grid searches over hyperparameters but for
-different purposes: Stage 2 *selects* a single winner per classifier;
-Sweeps *visualises* the hyperparameter landscape for the report's analysis.
-Sweeps only depends on Stage 1 (it derives each classifier's best
-preprocessing from `stage_1_results.csv`), so it can run any time after
-Stage 1 — including before Stage 2, as the Makefile does.
 
 ## Expected outputs
 
@@ -169,36 +189,7 @@ data-science/
 └── tests/                            # pytest suite (smoke tests)
 ```
 
-## Datasets
 
-**Parkinson's Disease** — speech recordings from 188 PD patients and 64
-healthy controls (Istanbul University). 754 features extracted via MFCCs,
-wavelet transforms, vocal fold features, and Tunable Q-Factor Wavelet
-Transform (TQWT). Patient-aware cross-validation prevents leakage from
-multiple recordings per patient.
-
-**Forest Covertype** — cartographic data from the US Forest Service for
-30×30 m cells. 10 continuous features (elevation, slope, distances) plus
-44 one-hot encoded soil-type and wilderness-area indicators. Target is one
-of 7 tree species. The full dataset is heavily imbalanced; experiments use
-a balanced subsample of 1,000 records per class (7,000 total).
-
-## Configuring a new dataset
-
-The pipeline is config-driven. To run on a different tabular dataset,
-provide a YAML in `configs/` modelled after `configs/parkinsons.yaml`
-(dataset path, target column, optional group column, preprocessing configs,
-models list, scoring metrics, class names) and invoke:
-
-```bash
-uv run data-science stage-1 --config configs/my_dataset.yaml
-uv run data-science sweeps  --config configs/my_dataset.yaml
-uv run data-science stage-2 --config configs/my_dataset.yaml
-uv run data-science final   --config configs/my_dataset.yaml
-```
-
-For datasets outside the built-in UCI registry, supply your own CSV under
-`data/raw/<name>/` and point the YAML's `dataset.path` at it.
 
 ## Development
 
@@ -218,4 +209,4 @@ Python 3.11+ · scikit-learn · XGBoost · pandas · NumPy · Matplotlib · uv
 
 ## Authors
 
-Diogo Ramalho, André Guerra and Miguel Trinca.
+Diogo Ramalho
