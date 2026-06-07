@@ -1,5 +1,8 @@
 # Parkinson's Disease & Forest Cover Type Classification
 
+[![CI](https://github.com/diogoalexandreramalho/data-science/actions/workflows/ci.yml/badge.svg)](https://github.com/diogoalexandreramalho/data-science/actions/workflows/ci.yml)
+[![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/release/python-3110/)
+
 End-to-end comparative ML study on two contrasting tabular classification
 problems: detecting Parkinson's disease from speech features (binary,
 high-dimensional, mildly imbalanced) and predicting forest cover type from
