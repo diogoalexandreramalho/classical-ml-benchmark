@@ -15,6 +15,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+import joblib
 import pandas as pd
 
 from data_science.evaluation.metrics import (
@@ -54,6 +55,7 @@ def run_final_evaluation(config_path: str | Path) -> dict[str, Any]:
     wandb_run = _wandb.init(ctx, stage_name="final")
     try:
         confusion_path = ctx.output_dir / "confusion_matrix.png"
+        model_path = ctx.output_dir / "model.joblib"
         result = run_final(
             tuning_results=tuning_results,
             X_train=ctx.X_train,
@@ -67,6 +69,7 @@ def run_final_evaluation(config_path: str | Path) -> dict[str, Any]:
             confusion_matrix_path=confusion_path,
             continuous_columns=ctx.continuous_columns,
             confusion_matrix_title=f"{ctx.name} best model — held-out test",
+            model_path=model_path,
         )
 
         classification_report = result["metrics"]["classification_report"]
@@ -83,6 +86,7 @@ def run_final_evaluation(config_path: str | Path) -> dict[str, Any]:
         final_path.write_text(json.dumps(final_metrics, indent=2, default=str))
         print(f"  wrote {final_path}")
         print(f"  wrote {confusion_path}")
+        print(f"  wrote {model_path}")
 
         per_class_path: Path | None = None
         if not ctx.is_binary:
@@ -128,6 +132,7 @@ def run_final_evaluation(config_path: str | Path) -> dict[str, Any]:
         _wandb.log_image(wandb_run, confusion_path, "test/confusion_matrix")
         if per_class_path is not None:
             _wandb.log_dataframe(wandb_run, pd.read_csv(per_class_path), "test/per_class")
+        _wandb.log_artifact(wandb_run, model_path, name=f"{ctx.name}-model", artifact_type="model")
 
         return result
     finally:
@@ -147,9 +152,11 @@ def run_final(
     confusion_matrix_path: str | Path,
     continuous_columns: list[str] | None = None,
     confusion_matrix_title: str = "Confusion matrix",
+    model_path: str | Path | None = None,
 ) -> dict[str, Any]:
     """Pick the overall best (model, preprocessing) from tuning, refit on the full
-    training set, evaluate on the held-out test set, and save the confusion matrix.
+    training set, evaluate on the held-out test set, save the confusion matrix,
+    and (if `model_path` is given) persist the fitted Pipeline via joblib.
     """
     winner_row = tuning_results.loc[tuning_results["best_score"].idxmax()]
     winner_model_name = winner_row["model"]
@@ -183,6 +190,10 @@ def run_final(
         output_path=confusion_matrix_path,
         title=confusion_matrix_title,
     )
+
+    if model_path is not None:
+        Path(model_path).parent.mkdir(parents=True, exist_ok=True)
+        joblib.dump(pipe, model_path)
 
     return {
         "best_model": winner_model_name,

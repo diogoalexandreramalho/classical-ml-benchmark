@@ -139,6 +139,7 @@ artifacts/final/<dataset>/
 ├── tuning_results.csv                # Stage-2 grid-search winners
 ├── final_metrics.json                # Held-out test metrics (chosen model)
 ├── confusion_matrix.png              # Held-out test confusion matrix
+├── model.joblib                      # Fitted sklearn Pipeline (preprocessing + model)
 ├── per_class_metrics.csv             # (Covertype only) per-class P/R/F1
 ├── feature_selection_sweep.csv       # SelectKBest sweep, all classifiers
 ├── feature_selection_per_class.csv   # Per-class F1 across SelectKBest k
