@@ -1,0 +1,7 @@
+model,best_preprocessing,best_params,best_score
+naive_bayes,raw,{},0.5527634311494272
+knn,raw,"{'metric': 'euclidean', 'n_neighbors': 1}",0.7885193676670761
+decision_tree,raw,"{'criterion': 'entropy', 'max_depth': 30, 'min_samples_leaf': 0.0001}",0.7365350198330193
+random_forest,scaled_feature_selection,"{'max_depth': 25, 'max_features': 'sqrt', 'n_estimators': 200}",0.8240235181404737
+gradient_boosting,raw,"{'learning_rate': 0.1, 'max_depth': 10, 'max_features': 'sqrt', 'n_estimators': 200}",0.8284707846858884
+xgboost,raw,"{'max_depth': 10, 'n_estimators': 200}",0.8280788924100617

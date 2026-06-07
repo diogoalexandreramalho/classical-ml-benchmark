@@ -1,21 +1,34 @@
 # Python
 __pycache__/
-*.pyc
-*.pyo
-*.egg-info/
-.venv/
-build/
-dist/
-
-# Tooling caches
+*.py[cod]
+.pytest_cache/
 .ruff_cache/
+.ipynb_checkpoints/
 
 # macOS
 .DS_Store
 
-# IDE
-.vscode/
-.idea/
+# Environments
+.venv/
+.env
 
-# Raw datasets — regenerable via `python scripts/download_data.py`
-data/raw/*.csv
+# Raw/generated data
+data/raw/**
+!data/raw/.gitkeep
+data/interim/**
+!data/interim/.gitkeep
+data/processed/**
+!data/processed/.gitkeep
+
+# Scratch artifacts
+artifacts/scratch/
+results/scratch/
+
+# LaTeX build files
+reports/*.aux
+reports/*.log
+reports/*.out
+reports/*.toc
+reports/*.fls
+reports/*.fdb_latexmk
+reports/*.synctex.gz

@@ -1,0 +1,63 @@
+dataset:
+  name: parkinsons
+  source_code: PD
+  path: data/raw/parkinsons/pd_speech_features.csv
+  target_column: class
+  group_column: id
+  drop_columns:
+    - id
+  class_names:
+    - Healthy
+    - PD
+  zero_index_labels: false
+
+split:
+  test_size: 0.2
+  random_state: 42
+  strategy: group
+
+cv:
+  strategy: stratified_group_kfold
+  n_splits: 10
+
+preprocessing:
+  configs:
+    - name: raw
+      scale: false
+      feature_selection: false
+      pca: false
+
+    - name: scaled
+      scale: true
+      feature_selection: false
+      pca: false
+
+    - name: scaled_feature_selection
+      scale: true
+      feature_selection: true
+      pca: false
+      k_best: 50
+
+    - name: scaled_pca
+      scale: true
+      feature_selection: false
+      pca: true
+      pca_components: 0.95
+
+models:
+  - naive_bayes
+  - knn
+  - decision_tree
+  - random_forest
+  - gradient_boosting
+  - xgboost
+
+metrics:
+  primary: f1
+  scoring:
+    accuracy: accuracy
+    precision: precision
+    recall: recall
+    specificity: specificity
+    f1: f1
+    roc_auc: roc_auc

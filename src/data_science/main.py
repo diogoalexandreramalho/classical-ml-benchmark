@@ -1,50 +1,68 @@
+from __future__ import annotations
+
 import argparse
 
-import yaml
+from data_science.data.datasets import DATASETS
+from data_science.experiments.stage_1 import run_stage_1
+from data_science.experiments.sweeps import run_sweeps
+from data_science.experiments.stage_2 import run_stage_2
+from data_science.experiments.final import run_final_evaluation
+from data_science.experiments.reproduce import reproduce_all
 
-from data_science.datasets import DATASETS
-from data_science.tasks import arm, classify, clustering, preprocess
-from data_science.tasks.experiment import run_experiment
 
-TASKS = ("classify", "preprocess", "arm", "clustering", "experiment")
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description="Reproduce the ML report.")
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    download = subparsers.add_parser("download")
+    download.add_argument("--dataset", choices=list(DATASETS), required=True)
+
+    stage_1 = subparsers.add_parser("stage-1")
+    stage_1.add_argument("--config", required=True)
+
+    sweeps = subparsers.add_parser("sweeps")
+    sweeps.add_argument("--config", required=True)
+
+    stage_2 = subparsers.add_parser("stage-2")
+    stage_2.add_argument("--config", required=True)
+
+    final = subparsers.add_parser("final")
+    final.add_argument("--config", required=True)
+
+    subparsers.add_parser("reproduce")
+
+    return parser
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Run a task on a dataset.",
-    )
-    parser.add_argument("--task", choices=TASKS, required=True)
-    parser.add_argument(
-        "--dataset",
-        choices=list(DATASETS),
-        help="Required for all tasks except experiment.",
-    )
-    parser.add_argument(
-        "--config",
-        help="YAML config file (required for --task experiment).",
-    )
+    parser = build_parser()
     args = parser.parse_args()
 
-    if args.task == "experiment":
-        if not args.config:
-            parser.error("--task experiment requires --config <path>")
-        with open(args.config) as f:
-            cfg = yaml.safe_load(f)
-        run_experiment(**cfg)
+    if args.command == "download":
+        dataset = DATASETS[args.dataset]
+        dataset.download()
+        print(f"Downloaded {dataset.name} to {dataset.raw_path}")
         return
 
-    if not args.dataset:
-        parser.error(f"--task {args.task} requires --dataset")
+    if args.command == "stage-1":
+        run_stage_1(args.config)
+        return
 
-    data = DATASETS[args.dataset].read()
-    if args.task == "classify":
-        classify.run(data, args.dataset)
-    elif args.task == "preprocess":
-        preprocess.run(data, args.dataset)
-    elif args.task == "arm":
-        arm.run(data, args.dataset)
-    elif args.task == "clustering":
-        clustering.run(data, args.dataset)
+    if args.command == "sweeps":
+        run_sweeps(args.config)
+        return
+
+    if args.command == "stage-2":
+        run_stage_2(args.config)
+        return
+
+    if args.command == "final":
+        run_final_evaluation(args.config)
+        return
+
+    if args.command == "reproduce":
+        reproduce_all()
+        return
 
 
 if __name__ == "__main__":
